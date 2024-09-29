@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify
-import pickle
 import tensorflow as tf
 from flask_cors import CORS
 import numpy as np
@@ -12,19 +11,13 @@ CORS(app)
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 
-# Load the model from the pickle file
-with open('model.pkl', 'rb') as f:
-    model_data = pickle.load(f)
-
-# Reconstruct the Keras model from the configuration
-model = tf.keras.models.model_from_json(model_data['config'])
-model.set_weights(model_data['weights'])
+# Load the model from the h5 file
+model = tf.keras.models.load_model('model.h5')
 
 # Recreate the scaler with the same feature range as during training
-scaler = MinMaxScaler(feature_range=(0, 1))  # Adjust feature_range if different
+scaler = MinMaxScaler(feature_range=(0, 1))
 
 # Fit the scaler with hypothetical min and max values used during training
-# You'll need to manually specify these based on the training data
 scaler.fit(np.array([
     [10, 20, 500, 10, 0],  # hypothetical min values of your input features
     [100, 200, 10000, 100, 300]  # hypothetical max values of your input features
